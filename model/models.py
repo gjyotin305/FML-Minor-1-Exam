@@ -19,7 +19,7 @@ class Experiment(object):
         self.model = model
         self.processor = processor
 
-    def run_experiment(self, prompts: List[str]) -> List[Dict[str, str]]:
+    def run_experiment_text(self, prompts: List[str]) -> List[Dict[str, str]]:
         prompts_test = []
 
         for x in prompts:

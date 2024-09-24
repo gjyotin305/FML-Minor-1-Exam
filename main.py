@@ -17,7 +17,7 @@ processor = AutoProcessor.from_pretrained("llava-hf/llava-v1.6-mistral-7b-hf")
 
 exp1 = Experiment(model=model, processor=processor)
 
-result = exp1.run_experiment(BIAS_PROMPTS)
+result = exp1.run_experiment_text(BIAS_PROMPTS)
 
 for i, res in enumerate(result):
     print(f"Starting WordCloud Generation {i}")
