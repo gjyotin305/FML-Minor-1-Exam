@@ -15,7 +15,7 @@ class Experiment(object):
         model: LlavaNextForConditionalGeneration,
         processor: AutoProcessor
     ) -> None:
-        self.model = model,
+        self.model = model
         self.processor = processor
 
     def run_experiment(self, prompts: List[str]):
@@ -34,7 +34,7 @@ class Experiment(object):
 
         inputs = self.processor(
             text=prompts, padding=True, return_tensors="pt").to("cuda:0")
-        generate_ids = self.model.generate(**inputs, max_new_tokens=30)
+        generate_ids = self.model.generate(**inputs, max_new_tokens=100)
         result = self.processor.batch_decode(
             generate_ids,
             skip_special_tokens=True,
