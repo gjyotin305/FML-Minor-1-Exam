@@ -51,6 +51,39 @@ class Experiment(object):
 
         return logs_prompt
     
+    def run_experiments_image(self, images: List, prompts: str):
+        prompts_test = []
+
+        for x in prompts:
+            conversation = [
+                {
+                    "role": "user",
+                    "content": [
+                        {"type": "image"},
+                        {"type": "text", "text": f"{x}"},
+                    ],
+                },
+            ]
+            conversation_prompt = self.processor.apply_chat_template(conversation, add_generation_prompt=True)
+            prompts_test.append(conversation_prompt)
+
+        inputs = self.processor(
+            text=prompts_test, images=images, padding=True, return_tensors="pt").to("cuda:0")
+        generate_ids = self.model.generate(**inputs, max_new_tokens=700)
+        result = self.processor.batch_decode(
+            generate_ids,
+            skip_special_tokens=True,
+            clean_up_tokenization_spaces=False
+        )
+
+        logs_prompt = [{"prompt": x, "response": y} for x, y in zip(prompts, result)]
+
+        with open("logs_images.json", "w") as final:
+            json.dump(logs_prompt, final)
+            final.close()
+
+        return logs_prompt
+
     def run_inference(self, prompt: str):
         process_prompt = [
             {
