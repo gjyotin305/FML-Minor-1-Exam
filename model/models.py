@@ -5,7 +5,7 @@ from transformers import (
 )
 import torch
 import json
-from typing import List
+from typing import List, Dict
 from PIL import Image
 import requests
 
@@ -19,7 +19,7 @@ class Experiment(object):
         self.model = model
         self.processor = processor
 
-    def run_experiment(self, prompts: List[str]):
+    def run_experiment(self, prompts: List[str]) -> List[Dict[str, str]]:
         prompts_test = []
 
         for x in prompts:

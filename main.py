@@ -1,5 +1,6 @@
 from transformers import AutoProcessor, LlavaNextForConditionalGeneration
 from model.models import Experiment
+from eval.utils import generate_wordcloud
 from constants import BIAS_PROMPTS
 import json
 import torch
@@ -18,4 +19,7 @@ exp1 = Experiment(model=model, processor=processor)
 
 result = exp1.run_experiment(BIAS_PROMPTS)
 
-print(result)
+for i, res in enumerate(result):
+    print(f"Starting WordCloud Generation {i}")
+    print(res["response"])
+    generate_wordcloud(text=res["response"], file_name=f"{i}")
