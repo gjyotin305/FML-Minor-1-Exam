@@ -31,11 +31,12 @@ class Experiment(object):
                     ],
                 },
             ]
-            prompts_test.append(conversation)
+            conversation_prompt = self.processor.apply_chat_template(conversation, add_generation_prompt=True)
+            prompts_test.append(conversation_prompt)
 
         inputs = self.processor(
-            text=prompts, padding=True, return_tensors="pt").to("cuda:0")
-        generate_ids = self.model.generate(**inputs, max_new_tokens=300)
+            text=prompts_test, padding=True, return_tensors="pt").to("cuda:0")
+        generate_ids = self.model.generate(**inputs, max_new_tokens=700)
         result = self.processor.batch_decode(
             generate_ids,
             skip_special_tokens=True,
@@ -49,6 +50,27 @@ class Experiment(object):
             final.close()
 
         return logs_prompt
+    
+    def run_inference(self, prompt: str):
+        process_prompt = [
+            {
+                "role": "user",
+                "content": [
+                    {"type": "text", "text": f"{prompt}"},
+                ],
+            },
+        ]
+        prompt = self.processor.apply_chat_template(process_prompt, add_generation_prompt=True)
+
+        inputs = self.processor(
+            text=prompt, padding=True, return_tensors="pt").to("cuda:0")
+        generate_ids = self.model.generate(**inputs, max_new_tokens=700)
+        result = self.processor.decode(
+            generate_ids,
+            skip_special_tokens=True,
+            clean_up_tokenization_spaces=False
+        )
+        return result
 
 
 # processor = LlavaNextProcessor.from_pretrained("llava-hf/llava-v1.6-mistral-7b-hf")

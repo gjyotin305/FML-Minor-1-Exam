@@ -23,3 +23,6 @@ for i, res in enumerate(result):
     print(f"Starting WordCloud Generation {i}")
     print(res["response"])
     generate_wordcloud(text=res["response"], file_name=f"{i}")
+
+
+# print(exp1.run_inference(BIAS_PROMPTS[4]))
