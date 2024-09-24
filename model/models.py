@@ -4,15 +4,16 @@ from typing import List
 from PIL import Image
 import requests
 
+
 class Experiment(object):
     def __init__(
-        self, 
-        model: LlavaNextForConditionalGeneration, 
+        self,
+        model: LlavaNextForConditionalGeneration,
         processor: AutoProcessor
     ) -> None:
         self.model = model,
         self.processor = processor
-    
+
     def run_experiment(self, prompts: List[str]):
         prompts_test = []
 
@@ -26,26 +27,25 @@ class Experiment(object):
                 },
             ]
             prompts_test.append(conversation)
-        
-        inputs =self.processor(
+
+        inputs = self.processor(
             text=prompts, padding=True, return_tensors="pt").to("cuda:0")
         generate_ids = self.model.generate(**inputs, max_new_tokens=30)
         result = self.processor.batch_decode(
-            generate_ids, 
-            skip_special_tokens=True, 
+            generate_ids,
+            skip_special_tokens=True,
             clean_up_tokenization_spaces=False
         )
         return result
 
 
-
 # processor = LlavaNextProcessor.from_pretrained("llava-hf/llava-v1.6-mistral-7b-hf")
 
 # model = LlavaNextForConditionalGeneration.from_pretrained(
-#     "llava-hf/llava-v1.6-mistral-7b-hf", 
-#     torch_dtype=torch.float16, 
+#     "llava-hf/llava-v1.6-mistral-7b-hf",
+#     torch_dtype=torch.float16,
 #     low_cpu_mem_usage=True
-# ) 
+# )
 # model.to("cuda:0")
 # model = torch.compile(model)
 
