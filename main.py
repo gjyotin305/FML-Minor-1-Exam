@@ -1,6 +1,7 @@
 from transformers import AutoProcessor, LlavaNextForConditionalGeneration
 from model.models import Experiment
 from constants import BIAS_PROMPTS
+import json
 import torch
 
 model = LlavaNextForConditionalGeneration.from_pretrained(

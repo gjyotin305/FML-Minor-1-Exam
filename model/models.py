@@ -4,6 +4,7 @@ from transformers import (
     AutoProcessor
 )
 import torch
+import json
 from typing import List
 from PIL import Image
 import requests
@@ -34,13 +35,20 @@ class Experiment(object):
 
         inputs = self.processor(
             text=prompts, padding=True, return_tensors="pt").to("cuda:0")
-        generate_ids = self.model.generate(**inputs, max_new_tokens=100)
+        generate_ids = self.model.generate(**inputs, max_new_tokens=300)
         result = self.processor.batch_decode(
             generate_ids,
             skip_special_tokens=True,
             clean_up_tokenization_spaces=False
         )
-        return result
+
+        logs_prompt = [{"prompt": x, "response": y} for x, y in zip(prompts, result)]
+
+        with open("logs.json", "w") as final:
+            json.dump(logs_prompt, final)
+            final.close()
+
+        return logs_prompt
 
 
 # processor = LlavaNextProcessor.from_pretrained("llava-hf/llava-v1.6-mistral-7b-hf")
