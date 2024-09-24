@@ -1,4 +1,8 @@
-from transformers import LlavaNextProcessor, LlavaNextForConditionalGeneration, AutoProcessor
+from transformers import (
+    LlavaNextProcessor, 
+    LlavaNextForConditionalGeneration, 
+    AutoProcessor
+)
 import torch
 from typing import List
 from PIL import Image
