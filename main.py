@@ -24,47 +24,49 @@ model_hall = AutoModelForCausalLM.from_pretrained(
 
 tokenizer = AutoTokenizer.from_pretrained("microsoft/Phi-3-mini-4k-instruct")
 
-# model = LlavaNextForConditionalGeneration.from_pretrained(
-#     "llava-hf/llava-v1.6-mistral-7b-hf", 
-#     torch_dtype=torch.float16, 
-#     device_map="auto"
-# )
-# model.to("cuda")
-# model = torch.compile(model=model)
+model = LlavaNextForConditionalGeneration.from_pretrained(
+    "llava-hf/llava-v1.6-mistral-7b-hf", 
+    torch_dtype=torch.float16, 
+    device_map="auto"
+)
+model.to("cuda")
+model = torch.compile(model=model)
 
-# processor = AutoProcessor.from_pretrained("llava-hf/llava-v1.6-mistral-7b-hf")
+processor = AutoProcessor.from_pretrained("llava-hf/llava-v1.6-mistral-7b-hf")
 
 exp1 = Experiment(
     model_hall=model_hall, 
-    token_hall=tokenizer
+    token_hall=tokenizer,
+    model=model,
+    processor=processor
 )
 
-# result = exp1.run_experiment_text(BIAS_PROMPTS)
+result = exp1.run_experiment_text(BIAS_PROMPTS)
 
-# for i, res in enumerate(result):
-#     print(f"Starting WordCloud Generation {i}")
-#     print(res["response"])
-#     generate_wordcloud(text=res["response"], file_name=f"{i}")
+for i, res in enumerate(result):
+    print(f"Starting WordCloud Generation {i}")
+    print(res["response"])
+    generate_wordcloud(text=res["response"], file_name=f"{i}")
 
-# urls = [
-#     "https://i.imgur.com/3QIgja2.jpeg",
-#     "https://i.imgur.com/4TfBERc.jpeg",
-#     "https://imgur.com/Re7Nli8.jpeg"
-# ]
+urls = [
+    "https://i.imgur.com/3QIgja2.jpeg",
+    "https://i.imgur.com/4TfBERc.jpeg",
+    "https://imgur.com/Re7Nli8.jpeg"
+]
 
-# for i, url in enumerate(urls):
-#     urllib.request.urlretrieve(url=url, filename=f"im_{i}.png")
+for i, url in enumerate(urls):
+    urllib.request.urlretrieve(url=url, filename=f"im_{i}.png")
 
-# images_pil = [Image.open(f"im_{i}.png") for i, url in enumerate(urls)]
+images_pil = [Image.open(f"im_{i}.png") for i, url in enumerate(urls)]
 
-# print(images_pil)
+print(images_pil)
 
-# result_ima = exp1.run_experiments_image(
-#     prompts=BIAS_IMAGE_PROMPTS, 
-#     images=images_pil
-# )
+result_ima = exp1.run_experiments_image(
+    prompts=BIAS_IMAGE_PROMPTS, 
+    images=images_pil
+)
 
-# print(result_ima)
+print(result_ima)
 
 exp1.run_inference_text(MEDICINE_PROMPTS, filename="med")
 exp1.run_inference_text(TECH_PROMPTS, filename="tech")
