@@ -1,23 +1,48 @@
 from transformers import (
     LlavaNextProcessor, 
     LlavaNextForConditionalGeneration, 
-    AutoProcessor
+    AutoProcessor,
+    AutoModelForCausalLM,
+    AutoTokenizer
 )
 import torch
 import json
 from typing import List, Dict
 from PIL import Image
+from eval.utils import run_inference, calc_perplexity
+from openai import OpenAI
 import requests
 
 
 class Experiment(object):
     def __init__(
         self,
-        model: LlavaNextForConditionalGeneration,
-        processor: AutoProcessor
+        model: LlavaNextForConditionalGeneration = None,
+        model_hall: AutoModelForCausalLM = None,
+        token_hall:AutoTokenizer = None,
+        processor: AutoProcessor = None
     ) -> None:
         self.model = model
+        self.model_hall = model_hall
         self.processor = processor
+        self.token_hall = token_hall
+
+    def run_inference_text(
+        self, 
+        prompts: List[Dict[str, str]]
+    ) -> List[Dict[str, str]]:
+        pp_prompts = [x["prompt"] for x in prompts]
+        responses = [run_inference(self.model_hall, self.token_hall, prompts=prompt) for prompt in pp_prompts]
+
+        perplexity_score = calc_perplexity(generated_responses=responses)
+
+        logs_hall = [{"prompt": prompt, "response": response, "ppl": ppl} for prompt, response, ppl in zip(pp_prompts, responses, perplexity_score["perplexities"])]
+
+        with open("logs_hall.json", "w") as final:
+            json.dump(logs_hall, final)
+            final.close()
+        
+        return logs_hall
 
     def run_experiment_text(self, prompts: List[str]) -> List[Dict[str, str]]:
         prompts_test = []
@@ -51,7 +76,7 @@ class Experiment(object):
 
         return logs_prompt
     
-    def run_experiments_image(self, images: List, prompts: str):
+    def run_experiments_image(self, images, prompts: str):
         prompts_test = []
 
         for x in prompts:
@@ -78,9 +103,8 @@ class Experiment(object):
 
         logs_prompt = [{"prompt": x, "response": y} for x, y in zip(prompts, result)]
 
-        with open("logs_images.json", "w") as final:
+        with open("logs_images_1.json", "w") as final:
             json.dump(logs_prompt, final)
-            final.close()
 
         return logs_prompt
 
