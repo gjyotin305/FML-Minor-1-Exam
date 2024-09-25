@@ -29,16 +29,17 @@ class Experiment(object):
 
     def run_inference_text(
         self, 
-        prompts: List[Dict[str, str]]
+        prompts: List[Dict[str, str]],
+        filename: str
     ) -> List[Dict[str, str]]:
         pp_prompts = [x["prompt"] for x in prompts]
         responses = [run_inference(self.model_hall, self.token_hall, prompts=prompt) for prompt in pp_prompts]
 
-        perplexity_score = calc_perplexity(generated_responses=responses)
+        perplexity_score = calc_perplexity(generated_responses=pp_prompts)
 
-        logs_hall = [{"prompt": prompt, "response": response, "ppl": ppl} for prompt, response, ppl in zip(pp_prompts, responses, perplexity_score["perplexities"])]
+        logs_hall = [{"prompt": prompt, "response": response, "ppl_score": ppl} for prompt, response, ppl in zip(pp_prompts, responses, perplexity_score["perplexities"])]
 
-        with open("logs_hall.json", "w") as final:
+        with open(f"logs_hall_{filename}.json", "w") as final:
             json.dump(logs_hall, final)
             final.close()
         

@@ -12,10 +12,12 @@ def generate_wordcloud(text: str, file_name: str):
     plt.savefig(f"word_cloud_{file_name}.png")
 
 def calc_perplexity(generated_responses: List[str]) -> Dict[str, int]:
+    torch.cuda.empty_cache()
     perplexity = load("perplexity", module_type="metric")
     results = perplexity.compute(
         model_id="microsoft/Phi-3-mini-4k-instruct", 
-        predictions=generated_responses
+        predictions=generated_responses,
+        batch_size=1
     )
     return results
 
@@ -39,9 +41,10 @@ def run_inference(
         "max_new_tokens": 600,
         "return_full_text": False,
         "temperature": 0.3,
-        "do_sample": False,
+        "do_sample": True,
     }
 
     output = pipe(messages, **generation_args)
-    return output[0]['generated_text']
+    print(output[0]['generated_text'])
+    return str(output[0]['generated_text'])
 

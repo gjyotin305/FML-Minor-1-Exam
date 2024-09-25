@@ -22,23 +22,19 @@ model_hall = AutoModelForCausalLM.from_pretrained(
     trust_remote_code=True, 
 )
 
-model_hall = torch.compile(model_hall)
-
 tokenizer = AutoTokenizer.from_pretrained("microsoft/Phi-3-mini-4k-instruct")
 
-model = LlavaNextForConditionalGeneration.from_pretrained(
-    "llava-hf/llava-v1.6-mistral-7b-hf", 
-    torch_dtype=torch.float16, 
-    device_map="auto"
-)
-model.to("cuda")
-model = torch.compile(model=model)
+# model = LlavaNextForConditionalGeneration.from_pretrained(
+#     "llava-hf/llava-v1.6-mistral-7b-hf", 
+#     torch_dtype=torch.float16, 
+#     device_map="auto"
+# )
+# model.to("cuda")
+# model = torch.compile(model=model)
 
-processor = AutoProcessor.from_pretrained("llava-hf/llava-v1.6-mistral-7b-hf")
+# processor = AutoProcessor.from_pretrained("llava-hf/llava-v1.6-mistral-7b-hf")
 
 exp1 = Experiment(
-    model=model, 
-    processor=processor,
     model_hall=model_hall, 
     token_hall=tokenizer
 )
@@ -70,6 +66,6 @@ exp1 = Experiment(
 
 # print(result_ima)
 
-result = exp1.run_inference_text(MEDICINE_PROMPTS)
-
-print(result)
+exp1.run_inference_text(MEDICINE_PROMPTS, filename="med")
+exp1.run_inference_text(TECH_PROMPTS, filename="tech")
+exp1.run_inference_text(HISTORY_PROMPTS, filename="history")
